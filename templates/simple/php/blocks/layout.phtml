@@ -1,0 +1,17 @@
+<?php
+/**
+ * @var array $params
+ */
+?>
+<div class="container my-3">
+	<h1>Hello world!</h1>
+	<?php {
+		$mysql = MySqlConnection::getInstance()->get();
+		$res = $mysql->query("SELECT NOW() AS date");
+
+		while ($row = $res->fetch_assoc()) {
+			printf("%s<br/>", $row["date"]);
+		}
+	}?>
+</div>
+
