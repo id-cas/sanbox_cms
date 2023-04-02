@@ -1,7 +1,7 @@
 <?php
 class Templater implements iTemplater{
-	private $dir;
-	private $scope = [];
+	private string $dir;
+	private array $scope = [];
 
 	public function __construct($dir){
 		$this->layoutExists($dir);
@@ -18,11 +18,11 @@ class Templater implements iTemplater{
 		}
 	}
 
-	public function setScope($scope){
+	public function setScope($scope): void{
 		$this->scope = $scope;
 	}
 
-	public function getScope(){
+	public function getScope(): array{
 		return $this->scope;
 	}
 
@@ -41,13 +41,13 @@ class Templater implements iTemplater{
 		include $template;
 	}
 
-	public function rn($template, $params = []){
+	public function rn($template, $params = []):string {
 		$path = $this->dir. '/'. $template. '.phtml';
 		$this->layoutExists($path);
 		return $this->functionGetOutput('self::display', $path, $params);
 	}
 
-	public function com($component, $method, $params = []){
+	public function com($component, $method, $params = []): array {
 
 	}
 }

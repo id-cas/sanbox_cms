@@ -1,7 +1,7 @@
 <?php
 class Config implements iConfig {
 	private static $instance;
-	private $configData;
+	private array $configData;
 
 	public function __construct(){
 		$path = WORKING_DIR. '/config.ini';
@@ -13,7 +13,7 @@ class Config implements iConfig {
 		$this->configData = parse_ini_file($path, true);
 	}
 
-	public static function getInstance() {
+	public static function getInstance(): self {
 		if (self::$instance === null) {
 			self::$instance = new Config();
 		}

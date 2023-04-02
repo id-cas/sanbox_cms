@@ -1,7 +1,7 @@
 <?php
 class MySqlConnection implements iMySqlConnection {
 	private static $instance;
-	private $connection;
+	private mysqli $connection;
 
 	public function __construct(){
 		$conf = Config::getInstance()->get('mysql');
@@ -21,14 +21,14 @@ class MySqlConnection implements iMySqlConnection {
 		}
 	}
 
-	public static function getInstance() {
+	public static function getInstance(): self {
 		if (self::$instance === null) {
 			self::$instance = new MySqlConnection();
 		}
 		return self::$instance;
 	}
 
-	public function get(){
+	public function get(): mysqli{
 		return $this->connection;
 	}
 }

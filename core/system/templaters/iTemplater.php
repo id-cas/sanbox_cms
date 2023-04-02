@@ -1,5 +1,7 @@
 <?php
 interface iTemplater {
-	public function rn($template, $params = []);
-	public function com($component, $method, $params = []);
+	public function setScope($scope):void;
+	public function getScope(): array;
+	public function rn($template, $params = []): string;
+	public function com($component, $method, $params = []): array;
 }

@@ -48,11 +48,16 @@ try {
 
 	// Init Controller
 	// TODO: Controller start page from specific hierarchy or components public api methods
-	// [$component, $method, $params] = Controller::getInstance();
-	// echo $tmpl->rn('index', ['component' => $component, 'method' => $method, 'params' => $params]);
+	 $controller = Controller::getInstance();
+	 $route = $controller->getRoute();
 
-	// Start Template with Controller params
-	echo $tmpl->rn('index');
+	 // START Templating
+	 $indexFile = $config->get('templates', 'index');
+	 echo $tmpl->rn($indexFile, [
+	 	'component' => $route['component'],
+		 'method' =>  $route['method'],
+		 'params' =>  $route['params']
+	 ]);
 }
 catch (Exception $e){
 	echo $e->getMessage();
