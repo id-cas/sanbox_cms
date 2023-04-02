@@ -1,4 +1,5 @@
 <?php
+class API {}
 
 function scanAllDirs($dir) {
 	$result = [];
@@ -22,6 +23,10 @@ function includeClassesInDir($root){
 		if(strpos($dir, 'bootstrap') !== false) continue;
 		include_once WORKING_DIR. '/'. $root. '/'. $dir;
 	}
+}
+
+function getRequestParam($param){
+	return $_GET[$param] ?? $_POST[$param] ?? null;
 }
 
 function dump() {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="info216.firstvds.ru" remoteFilesAllowedToDisappearOnAutoupload="false">
+  <component name="PublishConfigData" autoUpload="Always" serverName="info216.firstvds.ru" deleteMissingItems="true">
     <serverData>
       <paths name="cwrk.ru PROD">
         <serverdata>
@@ -26,7 +26,7 @@
       <paths name="info216.firstvds.ru">
         <serverdata>
           <mappings>
-            <mapping deploy="/info216.fvds.ru" local="$PROJECT_DIR$/../sandbox_cms" web="/" />
+            <mapping deploy="/langame.cvvrk.ru" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>

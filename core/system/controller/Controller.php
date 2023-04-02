@@ -23,28 +23,71 @@ class Controller implements iController {
 				'query' => [],
 				'data' => [],
 				'page' => [
-					'default' => true
+					'default' => false
 				]
 			]
 		];
 
 		// Decompose request data
-		$uri = explode('/', $_SERVER['REQUEST_URI']);
-		$parsedQuery = parse_url($_SERVER['QUERY_STRING']);
-		$query = isset($parsedQuery['query']) ? $parsedQuery['query'] : [];
+		parse_str(urldecode($_SERVER['QUERY_STRING']), $query);
+		$uri = array_filter(explode('/', $query['path'] ?? ''));
+		$route['params']['page']['uri'] = $query['path'] ?? '/';
+
+
+		if(isset($query['path'])){
+			unset($query['path']);
+		}
 
 		// Is DEFAULT-HOME page
+		// TODO: Also detect from hierarchy
 		if(count($uri) === 0){
 			$route['params']['page']['default'] = true;
 			$route['params']['page']['query'] = $query;
 			return $route;
 		}
 
+		// PRIORITY: First
+		// API
+		if(count($uri) === 3 && $uri[0] === 'api') {
+			header('Content-Type: application/json; charset=utf-8');
+			$componentName = 'Api'. ucfirst($uri[1]);
+
+			try {
+				$component = new $componentName;
+				$method = mb_strtolower($uri[2]);
+				echo json_encode(['result' => $component->$method()]);
+			}
+			catch (Exception $e){
+				 echo json_encode(['error' => $e->getMessage()]);
+			}
+
+			exit();
+		}
+
+		// PRIORITY: Second
 		// First two URI components is a COMPONENT + METHOD names, other - is system request params
-		$apiMap = [
-			'componentName_1' => ['method_1', 'method_2'],
-			'componentName_2' => ['method_1', 'method_2'],
-		];
+		if(count($uri) === 2) {
+			$component = mb_strtolower($uri[0]);
+			$method = mb_strtolower($uri[1]);
+
+			$componentName = 'Api'. ucfirst($component);
+			$classMethods = get_class_methods($componentName);
+
+			if(in_array($method, $classMethods)){
+				$route['params']['component'] = $component;
+				$route['params']['method'] = $method;
+			}
+			else {
+				$route['params']['component'] = 'content';
+				$route['params']['method'] = '404';
+			}
+
+			return $route;
+		}
+
+
+		// PRIORITY: Third
+		// Try to found page in HIERARCHY
 		if(count($uri) > 1 && isset($apiMap[$uri[0]]) && isset($apiMap[$uri[0]][$uri[1]])){
 			// TODO: Execute components API method and full fill data
 			$route['params']['page']['data'] = [
@@ -53,7 +96,6 @@ class Controller implements iController {
 			return $route;
 		}
 
-		// Try to find pageId in hierarchy and return result with page type
 
 
 		// 404
