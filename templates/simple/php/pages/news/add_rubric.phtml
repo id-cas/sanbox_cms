@@ -4,4 +4,14 @@
  */
 ?>
 <h1>Add news rubric</h1>
+<form class="row">
+	<div class="col-lg-6">
+		<div class="input-group mb-3">
+			<input name="title" type="text" class="form-control" placeholder="Rubric title" aria-label="Rubric title" aria-describedby="button-title">
+			<button class="btn btn-outline-secondary" type="button" id="button-title" data-bs-toggle="modal" data-bs-target="#showHierarchyTree">Select parent rubric</button>
+		</div>
+		<?= $this->rn('widgets/modal/rubric_tree', ['id' => 'showHierarchyTree', 'title' => 'Rubric hierarchy']) ?>
+		<button type="submit" class="btn btn-primary">Submit</button>
+	</div>
+</form>
 

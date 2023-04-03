@@ -20,6 +20,7 @@ CREATE TABLE `cms_hierarchy` (
      `is_active` tinyint(1) DEFAULT NULL,
      `updatetime` int(11) DEFAULT NULL,
      `is_default` tinyint(1) DEFAULT '0',
+     `uri` varchar(255) NOT NULL,
      PRIMARY KEY (`id`),
      KEY `is_default` (`is_default`),
      KEY `is_active` (`is_active`),

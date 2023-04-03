@@ -1,0 +1,30 @@
+<?php
+/**
+ * @var array $params
+ */
+
+$newsRubric = new NewRubric();
+$rubricsTree = $newsRubric->getList(0);
+?>
+
+<!-- Modal -->
+<div class="modal fade" id="<?= $params['id'] ?>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel"><?= $params['title'] ?></h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div id="treeview_container" class="hummingbird-treeview">
+					<?php if(count($rubricsTree['items'])): ?>
+						<?= $this->rn('widgets/modal/rubric_tree_items', $rubricsTree['items']) ?>
+					<?php endif; ?>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" data-bs-dismiss="modal">Apply</button>
+			</div>
+		</div>
+	</div>
+</div>

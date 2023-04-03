@@ -1,10 +1,10 @@
 <?php
 class Hierarchy {
 	private static $instance;
-	private MySqlConnection $connection;
+	public mysqli $connection;
 
 	public function __construct(){
-		$this->connection = MySqlConnection::getInstance();
+		$this->connection = MySqlConnection::getInstance()->get();
 	}
 
 	public static function getInstance(): self {
@@ -19,7 +19,7 @@ class Hierarchy {
 	 * @param $parentId
 	 * @return int
 	 */
-	private function getMaxOrd($parentId){
+	private function getMaxOrd($parentId): int{
 		$query = "SELECT MAX(ord) as ord FROM cms_hierarchy WHERE parent_id={$parentId})";
 		$res = $this->connection->query($query);
 
@@ -30,11 +30,88 @@ class Hierarchy {
 		return 0;
 	}
 
-	public function addElement($parentId, $objId, $isActive = 1, $ord = null){
+	public function addElement($parentId, $objId, $isActive = 1, $ord = null): int{
 		$ord = empty($ord) ? $this->getMaxOrd($parentId) : $ord;
 		$query = "INSERT INTO cms_hierarchy (`parent_id`, `obj_id`, `is_active`, `ord`) VALUES ({$parentId}, {$objId}, {$isActive}, {$ord})";
 		$res = $this->connection->query($query);
 		return $res->insert_id ? $res->insert_id : false;
+	}
+
+
+	private function getUrlComponent($page_id): array{
+		$query = "SELECT parent_id, uri FROM cms_hierarchy WHERE id={$page_id} ORDER BY ord ASC";
+		$res = $this->connection->query($query);
+
+		if($row = $res->fetch_assoc()){
+			return [
+				'parent_id' => $row['parent_id'],
+				'uri' => $row['uri']
+			];
+		}
+
+		return [];
+	}
+
+	public function getUrl($page_id): string{
+		$components = [];
+		while($component = $this->getUrlComponent($page_id)){
+			$components[] = $component['uri'];
+			$page_id = $component['parent_id'];
+		}
+		$components = array_reverse($components);
+		return '/'. implode('/', $components). '/';
+	}
+
+	public function getChildTree($parentId = 0, $includeRoot = false): array {
+		return ['items' => $this->getChildren($parentId, $includeRoot)];
+	}
+
+	private function getChildren($parentId = 0, $includeRoot = false): array {
+		$tree = [];
+
+		if($includeRoot && $parentId === 0){
+			$tree[] = [
+				'page_id' => 0,
+				'obj_id' => 0,
+				'uri' => '/',
+				'items' => $this->getChildren()
+			];
+
+			return $tree;
+		}
+
+		if($includeRoot){
+			$query = "SELECT id AS hid, obj_id, uri FROM cms_hierarchy WHERE id={$includeRoot} ORDER BY ord ASC";
+			$res = $this->connection->query($query);
+			if($row = $res->fetch_assoc()) {
+				$tree[] = [
+					'page_id' => $row['hid'],
+					'obj_id' => $row['obj_id'],
+					'uri' => $row['uri'],
+					'items' => $this->getChildren($row['hid'])
+				];
+			}
+
+			return $tree;
+		}
+
+		$query = "SELECT id AS hid, obj_id, uri FROM cms_hierarchy WHERE parent_id={$parentId} ORDER BY ord ASC";
+		$res = $this->connection->query($query);
+
+		while($row = $res->fetch_assoc()) {
+			$tree[] = [
+				'page_id' => $row['hid'],
+				'obj_id' => $row['obj_id'],
+				'uri' => $row['uri'],
+				'items' => $this->getChildren($row['hid'])
+			];
+		}
+
+		return $tree;
+	}
+
+	public function getUriComponents($hId){
+
 	}
 
 	public function getObjectId($hId){

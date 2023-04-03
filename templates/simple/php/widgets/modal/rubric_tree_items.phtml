@@ -1,0 +1,20 @@
+<?php
+/**
+ * @var array $params
+ */
+?>
+
+<?php if(count($params)): ?>
+	<ul class="list-group">
+		<?php foreach ($params as $item): ?>
+			<li class="list-group-item border-0">
+				<input class="form-check-input me-1" type="checkbox" name="parents[]" value="<?= $item['page_id'] ?>"/>
+				<a href="<?= $item['url'] ?>"><?= $item['title'] ?></a>
+
+				<?php if(count($item['items'])): ?>
+					<?= $this->rn('widgets/modal/rubric_tree_items', $item['items']) ?>
+				<?php endif; ?>
+			</li>
+		<?php endforeach; ?>
+	</ul>
+<?php endif; ?>
