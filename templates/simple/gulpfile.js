@@ -24,12 +24,12 @@ const less = 'assets/less/*.less';
 const cssLibraries = 'assets/css/lib/*.css';
 
 // Файлы для минификации
-const buildCss = 'public/build/css/*.css';
-const buildJs = 'public/build/js/*.js';
-const rimrafCss = 'public/build/css/*.min.css';
-const rimrafJs = 'public/build/js/*-min.js';
+const buildCss = '../../public/css/*.css';
+const buildJs = '../../public/js/*.js';
+const rimrafCss = '../../public/css/*.min.css';
+const rimrafJs = '../../public/js/*-min.js';
 
-const destination = 'public/build';
+const destination = '../../public';
 
 gulp.task('build-js-libraries', function() {
 	return gulp.src(jsLibraries)

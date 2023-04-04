@@ -35,6 +35,7 @@ CREATE TABLE `cms_hierarchy` (
 CREATE TABLE `cms_object_news_rubric` (
    `obj_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
    `title` varchar(255) DEFAULT NULL,
+   `content` text DEFAULT NULL,
    PRIMARY KEY (`obj_id`),
    CONSTRAINT `FK_object_news_rubric to plain object` FOREIGN KEY (`obj_id`) REFERENCES `cms_objects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

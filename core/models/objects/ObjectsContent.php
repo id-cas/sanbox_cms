@@ -1,10 +1,10 @@
 <?php
 class ObjectContent {
 	private static $instance;
-	private MySqlConnection $connection;
+	private mysqli $connection;
 
 	public function __construct(){
-		$this->connection = MySqlConnection::getInstance();
+		$this->connection = MySqlConnection::getInstance()->get();
 	}
 
 	public static function getInstance(): self {
@@ -18,16 +18,17 @@ class ObjectContent {
 		$keys = [];
 		$values = [];
 		foreach ($props as $key => $value) {
-			$keys[] = '`'. $key. '`';
-			$values[] = '`'. $value. '`';
+			$keys[] = "`{$key}`";
+			$values[] = "'{$value}'";
 		}
 
 		$keysStr = implode(',', $keys);
 		$valuesStr = implode(',', $values);
 
-		$query = "INSERT INTO cms_object_type_{$type} ({$keysStr}) VALUES ({$valuesStr})";
-		$res = $this->connection->query($query);
-		return $res->insert_id ? $res->insert_id : false;
+		$query = "INSERT INTO cms_object_{$type} ({$keysStr}) VALUES ({$valuesStr})";
+		$this->connection->query($query);
+		$insertId = mysqli_insert_id($this->connection);
+		return $insertId ? $insertId : false;
 	}
 
 

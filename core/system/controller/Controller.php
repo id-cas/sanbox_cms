@@ -1,10 +1,12 @@
 <?php
 class Controller implements iController {
 	public static $instance;
-	// private $hierarchy;
+	private Hierarchy $hierarchy;
+	private Objects $objects;
+
 	public function __construct(){
-		// TODO:
-		// $hierarchy = new Hierarchy();
+		$this->hierarchy = Hierarchy::getInstance();
+		$this->objects = Objects::getInstance();
 	}
 
 	public static function getInstance(): self {
@@ -32,7 +34,6 @@ class Controller implements iController {
 		parse_str(urldecode($_SERVER['QUERY_STRING']), $query);
 		$uri = array_filter(explode('/', $query['path'] ?? ''));
 		$route['params']['page']['uri'] = $query['path'] ?? '/';
-
 
 		if(isset($query['path'])){
 			unset($query['path']);
@@ -73,27 +74,42 @@ class Controller implements iController {
 			$componentName = 'Api'. ucfirst($component);
 			$classMethods = get_class_methods($componentName);
 
-			if(in_array($method, $classMethods)){
-				$route['params']['component'] = $component;
-				$route['params']['method'] = $method;
-			}
-			else {
-				$route['params']['component'] = 'content';
-				$route['params']['method'] = '404';
-			}
+			if(is_array($classMethods)){
+				if(in_array($method, $classMethods)){
+					$route['params']['component'] = $component;
+					$route['params']['method'] = $method;
+				}
+				else {
+					$route['params']['component'] = 'content';
+					$route['params']['method'] = '404';
+				}
 
-			return $route;
+				return $route;
+			}
 		}
 
 
 		// PRIORITY: Third
 		// Try to found page in HIERARCHY
-		if(count($uri) > 1 && isset($apiMap[$uri[0]]) && isset($apiMap[$uri[0]][$uri[1]])){
-			// TODO: Execute components API method and full fill data
-			$route['params']['page']['data'] = [
-				'component' => 'result'
-			];
-			return $route;
+		if(count($uri)){
+			$page = $this->hierarchy->pageByUrlArr(array_reverse($uri));
+
+			if(isset($page['obj_id'])){
+				$type = $this->objects->getType($page['obj_id']);
+
+				if(!empty($type)){
+					$components = explode('_', $type);
+
+					$route['params']['component'] = $components[0];
+					$route['params']['method'] = $components[1];
+
+					$route['params']['page']['id'] = $page['page_id'];
+					$route['params']['page']['obj_id'] = $page['obj_id'];
+					$route['params']['page']['parent_id'] = $page['parent_id'];
+
+					return $route;
+				}
+			}
 		}
 
 

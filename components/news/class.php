@@ -56,15 +56,17 @@ class NewRubric extends News{
 		return $this->cleanTree($children, $objects);
 	}
 
-	public function add($title, $parentId = 0){
+	public function add($title, $content, $parents): array{
+		$insertedPages = [];
 		if($objId = $this->objects->add($title, $this->type)){
-			if($hId = $this->hierarchy->addElement($parentId, $objId)){
-				if($this->objectContent->add($this->type, ['title' => $title])){
-					return $hId;
-				}
+			$this->objectContent->add($this->type, ['title' => $title, 'content' => $content]);
+
+			foreach ($parents as $parentId){
+				$pageId = $this->hierarchy->addElement($title, $parentId, $objId);
+				$insertedPages[] = $pageId;
 			}
 		}
-		return false;
+		return $insertedPages;
 	}
 }
 

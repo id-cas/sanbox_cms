@@ -14,10 +14,14 @@ class Objects {
 		return self::$instance;
 	}
 
-	public function getObjectsByType($type): array {
+	public function getObjectsByType($type = ''): array {
 		$objects = [];
 
-		$query = "SELECT id, title FROM cms_objects WHERE type='{$type}'";
+		$query = "SELECT id, title FROM cms_objects WHERE 1=1";
+		if(!empty($type)){
+			$query .= " AND type='{$type}'";
+		}
+
 		$res = $this->connection->query($query);
 
 		while($row = $res->fetch_assoc()) {
@@ -27,10 +31,33 @@ class Objects {
 		return $objects;
 	}
 
-	public function add($title, $type): int{
-		$query = "INSERT INTO cms_objects (`title`, `type`) VALUES ({$title}, {$type})";
+	public function getType($objId): string {
+		$query = "SELECT type FROM cms_objects WHERE id={$objId}";
 		$res = $this->connection->query($query);
-		return $res->insert_id ? $res->insert_id : false;
+
+		if($row = $res->fetch_assoc()) {
+			return $row['type'];
+		}
+
+		return '';
+	}
+
+	public function getName($objId): string {
+		$query = "SELECT title FROM cms_objects WHERE id={$objId}";
+		$res = $this->connection->query($query);
+
+		if($row = $res->fetch_assoc()) {
+			return $row['title'];
+		}
+
+		return '';
+	}
+
+	public function add($title, $type): int{
+		$query = "INSERT INTO cms_objects (`title`, `type`) VALUES ('{$title}', '{$type}')";
+		$this->connection->query($query);
+		$insertId = mysqli_insert_id($this->connection);
+		return $insertId ? $insertId : false;
 	}
 
 

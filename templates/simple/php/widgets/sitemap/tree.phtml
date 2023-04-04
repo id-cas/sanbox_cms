@@ -1,0 +1,12 @@
+<?php
+/**
+ * @var array $params
+ */
+
+$menu = new Menu();
+$sitemap = $menu->sitemap(0);
+?>
+
+<?php if(count($sitemap['items'])): ?>
+	<?= $this->rn('widgets/sitemap/tree_items', $sitemap['items']) ?>
+<?php endif; ?>

@@ -1,0 +1,9 @@
+<?php
+/**
+ * @var array $params
+ */
+
+$objects = Objects::getInstance();
+$title = $objects->getName($params['page']['obj_id']);
+?>
+<h1><?= $title ?></h1>

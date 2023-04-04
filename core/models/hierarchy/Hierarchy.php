@@ -20,7 +20,7 @@ class Hierarchy {
 	 * @return int
 	 */
 	private function getMaxOrd($parentId): int{
-		$query = "SELECT MAX(ord) as ord FROM cms_hierarchy WHERE parent_id={$parentId})";
+		$query = "SELECT MAX(ord) as ord FROM cms_hierarchy WHERE parent_id={$parentId}";
 		$res = $this->connection->query($query);
 
 		if($row = $res->fetch_assoc()) {
@@ -30,11 +30,51 @@ class Hierarchy {
 		return 0;
 	}
 
-	public function addElement($parentId, $objId, $isActive = 1, $ord = null): int{
-		$ord = empty($ord) ? $this->getMaxOrd($parentId) : $ord;
-		$query = "INSERT INTO cms_hierarchy (`parent_id`, `obj_id`, `is_active`, `ord`) VALUES ({$parentId}, {$objId}, {$isActive}, {$ord})";
+	private function uniqUri($title, $parentId, $objId): string{
+		$utils = new Utils();
+		$uri = $utils->translit($title);
+
+		$query = "SELECT obj_id, uri FROM cms_hierarchy WHERE parent_id={$parentId}";
 		$res = $this->connection->query($query);
-		return $res->insert_id ? $res->insert_id : false;
+
+		if(empty($res)) {
+			return $uri;
+		}
+
+		$dig = [];
+		while ($row = $res->fetch_assoc()) {
+			$childUri = $row['uri'];
+
+			if ($row['obj_id'] == $objId) {
+				return $childUri;
+			}
+
+			if (preg_match("/^$uri$|^$uri" . "_\d+$/", $childUri, $m)) {
+
+				if (preg_match("/_\d+$/", $childUri, $postfix)) {
+					$dig[] = intval(str_replace('_', '', $postfix[0]));
+				} else {
+					$dig[] = 0;
+				}
+			}
+		}
+
+		$uriPostfix = '';
+		if (count($dig)) {
+			$maxDig = max($dig);
+			$uriPostfix = "_" . ($maxDig + 1);
+		}
+
+		return $uri. $uriPostfix;
+	}
+
+	public function addElement($title, $parentId, $objId, $isActive = 1, $ord = null): int{
+		$uniqUri = $this->uniqUri($title, $parentId, $objId);
+		$ord = empty($ord) ? $this->getMaxOrd($parentId) : $ord;
+		$query = "INSERT INTO cms_hierarchy (`parent_id`, `obj_id`, `is_active`, `ord`, `uri`) VALUES ({$parentId}, {$objId}, {$isActive}, {$ord}, '{$uniqUri}')";
+		$this->connection->query($query);
+		$insertId = mysqli_insert_id($this->connection);
+		return $insertId ? $insertId : false;
 	}
 
 
@@ -110,8 +150,37 @@ class Hierarchy {
 		return $tree;
 	}
 
-	public function getUriComponents($hId){
 
+	public function pageByUrlArr($uriArr): array{
+		$query = '';
+
+		for ($i = 0; $i < count($uriArr); $i++){
+			$uri = $uriArr[$i];
+
+			if($i === 0){
+				$query = "SELECT h{$i}.id AS page_id, h{$i}.obj_id, h{$i}.parent_id FROM cms_hierarchy h{$i} WHERE h{$i}.uri='{$uri}' __EXISTS__";
+			}
+			else {
+				$j = $i - 1;
+				$sub = "AND EXISTS (SELECT h{$i}.id FROM cms_hierarchy h{$i} WHERE h{$j}.parent_id=h{$i}.id AND h{$i}.uri='{$uri}' __EXISTS__) ";
+				$query = preg_replace('/__EXISTS__/', $sub, $query);
+			}
+		}
+		$query = preg_replace('/__EXISTS__/', '', $query);
+
+
+
+		$res = $this->connection->query($query);
+
+		if($row = $res->fetch_assoc()) {
+			return [
+				'page_id' => $row['page_id'],
+				'parent_id' => $row['parent_id'],
+				'obj_id' => $row['obj_id']
+			];
+		}
+
+		return [];
 	}
 
 	public function getObjectId($hId){

@@ -4,11 +4,14 @@
  */
 ?>
 <h1>Add news rubric</h1>
-<form class="row">
+<form class="row form-async needs-validation" action="/api/news/add_rubric" method="POST" novalidate>
 	<div class="col-lg-6">
 		<div class="input-group mb-3">
-			<input name="title" type="text" class="form-control" placeholder="Rubric title" aria-label="Rubric title" aria-describedby="button-title">
+			<input name="title" type="text" class="form-control" placeholder="Rubric title" aria-label="Rubric title" aria-describedby="button-title" required>
 			<button class="btn btn-outline-secondary" type="button" id="button-title" data-bs-toggle="modal" data-bs-target="#showHierarchyTree">Select parent rubric</button>
+		</div>
+		<div class="input-group mb-3">
+			<textarea name="content" type="text" class="form-control" placeholder="Content" aria-label="Content" required></textarea>
 		</div>
 		<?= $this->rn('widgets/modal/rubric_tree', ['id' => 'showHierarchyTree', 'title' => 'Rubric hierarchy']) ?>
 		<button type="submit" class="btn btn-primary">Submit</button>
