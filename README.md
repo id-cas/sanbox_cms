@@ -10,8 +10,9 @@
 * Make comments in code for JSDOC.
 * Make tests.
 
-## The task
-Deploy a LEMP/LAMP web environment or other web stack on any free VDS/VPS or locally in your virtual environment. This task must be completed on Lavarel or native php (you can use third-party modules via composer if necessary)
+## Common information
+Deploy a LEMP/LAMP web environment or other web stack on any free VDS/VPS or locally in your virtual environment.
+This task must be completed on Lavarel or native php (you can use third-party modules via composer if necessary)
 
 ## Product Description
 Let's implement a news catalog.
