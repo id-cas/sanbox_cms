@@ -53,6 +53,26 @@ class Objects {
 		return '';
 	}
 
+	public function getProperties($objId, $propNames): array {
+		$type = $this->getType($objId);
+
+		$props = implode(',', $propNames);
+
+		$query = "SELECT {$props} FROM cms_object_{$type} WHERE obj_id={$objId}";
+		$res = $this->connection->query($query);
+
+		$values = [];
+		if($row = $res->fetch_assoc()) {
+			foreach ($propNames as $propName){
+				$values[$propName] = $row[$propName];
+			}
+
+			return $values;
+		}
+
+		return [];
+	}
+
 	public function add($title, $type): int{
 		$query = "INSERT INTO cms_objects (`title`, `type`) VALUES ('{$title}', '{$type}')";
 		$this->connection->query($query);

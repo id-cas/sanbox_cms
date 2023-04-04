@@ -4,6 +4,7 @@
  */
 
 $objects = Objects::getInstance();
-$title = $objects->getName($params['page']['obj_id']);
+$props = $objects->getProperties($params['page']['obj_id'], ['title', 'content']);
 ?>
-<h1><?= $title ?></h1>
+<h1><?= $props['title'] ?></h1>
+<div><?= $props['content'] ?></div>
