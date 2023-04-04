@@ -1,5 +1,10 @@
 # SANDBOX CMS as result of test-task for CV
 
+## Stack
+* PHP7.4
+* Bootstrap 5.3
+* JQuery 3.6
+
 ## TODO List
 * Make news/items component.
 * Make morphological or AI/ML.
