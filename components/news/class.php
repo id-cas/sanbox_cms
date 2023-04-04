@@ -29,7 +29,6 @@ class News {
 				$subItems = $this->cleanTree(['items' => $item['items']], $objects);
 			}
 
-			// TODO: Root fix
 			$tree['items'][] = [
 				'obj_id' => $item['obj_id'],
 				'page_id' => $item['page_id'],
@@ -56,17 +55,16 @@ class NewRubric extends News{
 		return $this->cleanTree($children, $objects);
 	}
 
-	public function add($title, $content, $parents): array{
-		$insertedPages = [];
+	public function add($title, $content, $parents): int{
 		if($objId = $this->objects->add($title, $this->type)){
-			$this->objectContent->add($this->type, ['title' => $title, 'content' => $content]);
+			$this->objectContent->add($this->type, ['obj_id' => $objId, 'title' => $title, 'content' => $content]);
 
 			foreach ($parents as $parentId){
 				$pageId = $this->hierarchy->addElement($title, $parentId, $objId);
 				$insertedPages[] = $pageId;
 			}
 		}
-		return $insertedPages;
+		return $objId;
 	}
 }
 

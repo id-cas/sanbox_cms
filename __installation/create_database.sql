@@ -5,7 +5,7 @@ flush privileges;
 
 CREATE TABLE `cms_objects` (
      `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-     `title` varchar(255) DEFAULT NULL,
+     `title` varchar(1024) DEFAULT NULL,
      `type` varchar(255) NOT NULL,
      PRIMARY KEY (`id`),
      KEY `Object to type relation_FK` (`type`),
@@ -33,8 +33,8 @@ CREATE TABLE `cms_hierarchy` (
 
 -- Instead of ORM create NEWS RUBRIC type=news_rubric
 CREATE TABLE `cms_object_news_rubric` (
-   `obj_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-   `title` varchar(255) DEFAULT NULL,
+   `obj_id` int(10) unsigned NOT NULL,
+   `title` varchar(1024) DEFAULT NULL,
    `content` text DEFAULT NULL,
    PRIMARY KEY (`obj_id`),
    CONSTRAINT `FK_object_news_rubric to plain object` FOREIGN KEY (`obj_id`) REFERENCES `cms_objects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -43,8 +43,8 @@ CREATE TABLE `cms_object_news_rubric` (
 
 -- Instead of ORM create NEWS ITEM type=news_item
 CREATE TABLE `cms_object_news_item` (
-       `obj_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-       `title` varchar(255) DEFAULT NULL,
+       `obj_id` int(10) unsigned NOT NULL,
+       `title` varchar(1024) DEFAULT NULL,
        `anons` varchar(1024) DEFAULT NULL,
        `content` text DEFAULT NULL,
        PRIMARY KEY (`obj_id`),
@@ -52,7 +52,19 @@ CREATE TABLE `cms_object_news_item` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
+-- Table for text indexation
+CREATE TABLE `cms_search` (
+        `obj_id` int(10) unsigned NOT NULL,
+        `itext` text DEFAULT NULL,
+        PRIMARY KEY (`obj_id`),
+        FULLTEXT KEY `search_itext` (`itext`),
+        CONSTRAINT `FK_search to plain object` FOREIGN KEY (`obj_id`) REFERENCES `cms_objects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 DROP TABLE cms_object_news_rubric;
 DROP TABLE cms_object_news_item;
 DROP TABLE cms_hierarchy;
+DROP TABLE cms_search;
+
 DROP TABLE cms_objects;

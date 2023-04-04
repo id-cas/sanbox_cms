@@ -78,8 +78,8 @@ class Hierarchy {
 	}
 
 
-	private function getUrlComponent($page_id): array{
-		$query = "SELECT parent_id, uri FROM cms_hierarchy WHERE id={$page_id} ORDER BY ord ASC";
+	private function getUrlComponent($pageId): array{
+		$query = "SELECT parent_id, uri FROM cms_hierarchy WHERE id={$pageId} ORDER BY ord ASC";
 		$res = $this->connection->query($query);
 
 		if($row = $res->fetch_assoc()){
@@ -92,11 +92,11 @@ class Hierarchy {
 		return [];
 	}
 
-	public function getUrl($page_id): string{
+	public function getUrl($pageId): string{
 		$components = [];
-		while($component = $this->getUrlComponent($page_id)){
+		while($component = $this->getUrlComponent($pageId)){
 			$components[] = $component['uri'];
-			$page_id = $component['parent_id'];
+			$pageId = $component['parent_id'];
 		}
 		$components = array_reverse($components);
 		return '/'. implode('/', $components). '/';
@@ -183,8 +183,21 @@ class Hierarchy {
 		return [];
 	}
 
+	public function getObjectPages($objId): array {
+		$query = "SELECT id AS page_id FROM cms_hierarchy WHERE obj_id={$objId} ORDER BY ord ASC";
+
+		$res = $this->connection->query($query);
+
+		$pages = [];
+		while($row = $res->fetch_assoc()) {
+			$pages[] = $row['page_id'];
+		}
+
+		return $pages;
+	}
+
 	public function getObjectId($hId){
-		$query = "SELECT obj_id FROM cms_hierarchy WHERE id={$hId})";
+		$query = "SELECT obj_id FROM cms_hierarchy WHERE id={$hId}";
 		$res = $this->connection->query($query);
 
 		if($row = $res->fetch_assoc()) {
@@ -195,7 +208,7 @@ class Hierarchy {
 	}
 
 	public function deleteElement($hId){
-		$query = "DELETE FROM cms_hierarchy WHERE id={$hId})";
+		$query = "DELETE FROM cms_hierarchy WHERE id={$hId}";
 		$this->connection->query($query);
 	}
 }

@@ -44,6 +44,7 @@ class Controller implements iController {
 		if(count($uri) === 0){
 			$route['params']['page']['default'] = true;
 			$route['params']['page']['query'] = $query;
+			$route['params']['page']['title'] = 'Home';
 			return $route;
 		}
 
@@ -78,10 +79,12 @@ class Controller implements iController {
 				if(in_array($method, $classMethods)){
 					$route['params']['component'] = $component;
 					$route['params']['method'] = $method;
+					$route['params']['page']['title'] = ucfirst($component). '/'. ucfirst($method);
 				}
 				else {
 					$route['params']['component'] = 'content';
 					$route['params']['method'] = '404';
+					$route['params']['page']['title'] = 'Not found';
 				}
 
 				return $route;
@@ -106,6 +109,7 @@ class Controller implements iController {
 					$route['params']['page']['id'] = $page['page_id'];
 					$route['params']['page']['obj_id'] = $page['obj_id'];
 					$route['params']['page']['parent_id'] = $page['parent_id'];
+					$route['params']['page']['title'] = $this->objects->getName($page['obj_id']);
 
 					return $route;
 				}
@@ -117,6 +121,7 @@ class Controller implements iController {
 		// 404
 		$route['params']['component'] = 'content';
 		$route['params']['method'] = '404';
+		$route['params']['page']['title'] = 'Not found';
 		return $route;
 	}
 }

@@ -1,0 +1,42 @@
+<?php
+/**
+ * @var array $params
+ */
+$search = new ApiSearch();
+$foundObjectsIdList = $search->pull();
+$searchString = $search->getSearchString();
+
+$objects = Objects::getInstance();
+$hierarchy = Hierarchy::getInstance();
+?>
+
+<h1>Search results</h1>
+
+<?php if(strlen($searchString) < 3): ?>
+	<h4>Request must contain more than 3 chars.</h4>
+<?php endif; ?>
+
+<?php if(strlen($searchString) >= 3 && !count($foundObjectsIdList)): ?>
+	<h4>Nothing found for your request <span class="px-2 bg-warning text-dark"><?= $searchString ?></span></h4>
+<?php else: ?>
+	<h4>Found <?= count($foundObjectsIdList) ?> pages matching your request <span class="px-2 bg-warning text-dark"><?= $searchString ?></span></h4>
+<?php endif; ?>
+
+<?php if(strlen($searchString) >= 3 && count($foundObjectsIdList)): ?>
+	<ol class="list-group list-group-numbered py-5">
+		<?php foreach($foundObjectsIdList as $objId): ?>
+			<?php {
+				$objProps = $objects->getProperties($objId, ['title']);
+				$pages = $hierarchy->getObjectPages($objId);
+			}?>
+			<?php foreach($pages as $pageId): ?>
+				<?php {
+					$url = $hierarchy->getUrl($pageId);
+				}?>
+				<li class="list-group-item">
+					<a href="<?= $url ?>" target="_blank"><?= $objProps['title'] ?></a>
+				</li>
+			<?php endforeach; ?>
+		<?php endforeach; ?>
+	</ol>
+<?php endif; ?>

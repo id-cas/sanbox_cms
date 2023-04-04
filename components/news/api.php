@@ -1,5 +1,11 @@
 <?php
 class ApiNews extends Api {
+	public Search $search;
+
+	public function __construct(){
+		$this->search = Search::getInstance();
+	}
+
 	public function add_rubric(){
 		$title = getRequestParam('title');
 		$content = getRequestParam('content');
@@ -18,9 +24,12 @@ class ApiNews extends Api {
 		}
 
 		$rubric = new NewRubric();
-		return $rubric->add($title, $content, $parents);
+		$objId = $rubric->add($title, $content, $parents);
 
-		// TODO: Call search reindex event
+		// TODO: Refactor search reindex event - Observer Pattern
+		$this->search->updateIndex($objId, "{$title} {$content}");
+
+		return $objId;
 	}
 
 
@@ -35,11 +44,11 @@ class ApiNews extends Api {
 		}
 
 		$rubric = new NewItem();
-		return $rubric->add($title, $anons, $content, $parentId);
+		$objId = $rubric->add($title, $anons, $content, $parentId);
 
-		// TODO: Call search reindex event
-	}
+		// TODO: Refactor search reindex event - Observer Pattern
+		$this->search->updateIndex($objId, "{$title} {$anons} {$content}");
 
-	public function add_virtual_item($hId, $parentId){
+		return $objId;
 	}
 }

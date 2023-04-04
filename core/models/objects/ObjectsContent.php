@@ -18,6 +18,8 @@ class ObjectContent {
 		$keys = [];
 		$values = [];
 		foreach ($props as $key => $value) {
+			$value = addslashes($value);
+
 			$keys[] = "`{$key}`";
 			$values[] = "'{$value}'";
 		}

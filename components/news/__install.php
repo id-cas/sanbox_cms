@@ -1,4 +1,6 @@
 <?php
+	// TODO: Create ORM like functional for creating/updating/deleting new data types
+
 	$newsRubricType = 'news_rubric';
 	$newsRubricTypeFields = [
 		'obj_id' => [

@@ -74,6 +74,7 @@ class Objects {
 	}
 
 	public function add($title, $type): int{
+		$title = addslashes($title);
 		$query = "INSERT INTO cms_objects (`title`, `type`) VALUES ('{$title}', '{$type}')";
 		$this->connection->query($query);
 		$insertId = mysqli_insert_id($this->connection);
