@@ -93,12 +93,35 @@ class Hierarchy {
 	}
 
 	public function getUrl($pageId): string{
+		// TODO: Make for speed testing to DB request: SINGLE vs MULTI query faster?
+
+		// SINGLE query method
+		$query = "WITH RECURSIVE parents AS ( ";
+		$query .= "	SELECT id, parent_id, uri ";
+		$query .= "	FROM cms_hierarchy ";
+		$query .= "	WHERE id=$pageId ";
+		$query .= "	UNION ALL ";
+		$query .= "	SELECT h.id, h.parent_id, h.uri ";
+		$query .= "	FROM cms_hierarchy h ";
+		$query .= "	JOIN parents p ON h.id = p.parent_id ";
+		$query .= "	) ";
+		$query .= "SELECT uri FROM parents ";
+		$query .= "ORDER BY id ASC; ";
+
 		$components = [];
-		while($component = $this->getUrlComponent($pageId)){
-			$components[] = $component['uri'];
-			$pageId = $component['parent_id'];
+		$res = $this->connection->query($query);
+		while($row = $res->fetch_assoc()){
+			$components[] = $row['uri'];
 		}
-		$components = array_reverse($components);
+
+		// // MULTI query method
+		// $components = [];
+		// while($component = $this->getUrlComponent($pageId)){
+		// 	$components[] = $component['uri'];
+		// 	$pageId = $component['parent_id'];
+		// }
+		// $components = array_reverse($components);
+
 		return '/'. implode('/', $components). '/';
 	}
 
